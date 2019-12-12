@@ -14,6 +14,11 @@ class Topo():
         n : number of channel
         '''
         self.Sig = Sig
+        self.gridz = None
+        self.points = None
+        self.values = None
+        self.grid_x = None
+        self.grid_y = None
 
     def _mgrid(self, padding=.1, resolution = 1000j, _method = 'linear'):
         
@@ -29,14 +34,29 @@ class Topo():
         y_max = y_max + dimY * padding
 
 
-        grid_x, grid_y = np.mgrid[x_min:x_max:resolution,y_min:y_max:resolution]
+        grid_x, grid_y = np.mgrid[x_min:x_max:resolution, \
+            y_min:y_max:resolution]
 
         points = Sig[:, 0:2]
         values = Sig[:,2]
 
         grid_z = griddata(points, values, (grid_x, grid_y), method=_method)
 
-        return grid_z.T
+        self.gridz = grid_z.T
+        self.points = points
+        self.values = values,
+        self.bound = (x_min, x_max, y_min, x_max)
+        self.grid_x ,self.grid_y  = grid_x, grid_y
+
+        return 0 
+
+    def plot(self):
+        self._mgrid()
+        plt.imshow(self.gridz, self.bound, alpha = .5 )
+        plt.contourf(self.gridx, self.grid_y, self.gridz, alpha = .5)
+        plt.colorbar()
+        plt.show()
+
 
 
 
@@ -45,12 +65,6 @@ if __name__ == "__main__":
     Sig = df[['x','y', 'signal']].values
 
     T = Topo(Sig)
-    (x,y), grid, extent, et, sig= T._mgrid(resolution = 1000j , _method = 'cubic')
-    plt.imshow(grid, extent=extent, alpha = .5)
-    plt.contourf(x, y, grid, alpha = .5)
-    plt.colorbar()
-    plt.scatter(et[:,1],et[:,0], c=sig)
-    
-    plt.show()
+    T.plot()
 
 
