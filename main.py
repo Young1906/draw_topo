@@ -36,7 +36,7 @@ class Topo():
 
         grid_z = griddata(points, values, (grid_x, grid_y), method=_method)
 
-        return (grid_x, grid_y), grid_z.T, (x_min, x_max, y_min, y_max), points, values
+        return grid_z.T
 
 
 
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     Sig = df[['x','y', 'signal']].values
 
     T = Topo(Sig)
-    (x,y), grid, extent, et, sig= T._mgrid(resolution = 100j , _method = 'cubic')
+    (x,y), grid, extent, et, sig= T._mgrid(resolution = 1000j , _method = 'cubic')
     plt.imshow(grid, extent=extent, alpha = .5)
     plt.contourf(x, y, grid, alpha = .5)
     plt.colorbar()
