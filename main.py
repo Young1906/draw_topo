@@ -20,7 +20,7 @@ class Topo():
         self.grid_x = None
         self.grid_y = None
 
-    def _mgrid(self, padding=.1, resolution = 1000j, _method = 'linear'):
+    def _mgrid(self, padding=.1, resolution = 1000j, _method = 'cubic'):
         
         x_min, x_max, y_min, y_max = np.min(Sig[:,0]), np.max(Sig[:,0]), \
             np.min(Sig[:,1]), np.max(Sig[:,1]), 
@@ -45,18 +45,37 @@ class Topo():
         self.gridz = grid_z.T
         self.points = points
         self.values = values,
-        self.bound = (x_min, x_max, y_min, x_max)
-        self.grid_x ,self.grid_y  = grid_x, grid_y
+        self.bound = (x_min, x_max, y_min, y_max)
+        self.sigs = values
 
         return 0 
 
     def plot(self):
+        # Interpolate data
         self._mgrid()
-        plt.imshow(self.gridz, self.bound, alpha = .5 )
-        plt.contourf(self.gridx, self.grid_y, self.gridz, alpha = .5)
-        plt.colorbar()
-        plt.show()
+        plt.set_cmap('Reds')
+        
+        # plt.subplots()
+        
+        plt.imshow(self.gridz, extent = self.bound, alpha = .5, \
+             origin='lower') #Important, else show inverse image
+        
 
+        # plt.contourf(self.gridz, extent = self.bound, alpha = .75)
+        cs = plt.contour(self.gridz, extent = self.bound, alpha = 1, \
+            origin='lower')
+        
+        plt.clabel(cs, inline=1,fmt = '%1.2f')
+
+        plt.scatter(self.points[:,0],self.points[:,1], s=2, c='black')
+        
+        x_min, x_max, y_min, y_max = self.bound
+        
+        plt.text((x_min+x_max)/2, y_max, "Front", horizontalalignment='center')
+        # plt.text(x_min, (y_min+y_max)/2, "Left")
+        # plt.text(x_max, (y_min+y_max)/2, "Right")
+        plt.axis('off')
+        plt.show()
 
 
 
@@ -66,5 +85,6 @@ if __name__ == "__main__":
 
     T = Topo(Sig)
     T.plot()
+    # plt.show()
 
 
